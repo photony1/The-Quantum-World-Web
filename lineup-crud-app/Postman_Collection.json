@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Music Festival Line-Up CRUD API",
+    "description": "Group 7 - ICT251 Activity 4 Postman Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET - List All Artists",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup"]
+        },
+        "description": "Retrieve all artists in the lineup"
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Get Single Artist",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Retrieve a specific artist by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Create New Artist",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Lusaka Music Fest 2025\",\n  \"artist_name\": \"New Artist\",\n  \"stage\": \"Main Stage\",\n  \"start_time\": \"20:00\",\n  \"end_time\": \"21:30\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/lineup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup"]
+        },
+        "description": "Create a new artist in the lineup"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT - Update Artist",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Lusaka Music Fest 2025\",\n  \"artist_name\": \"Updated Artist Name\",\n  \"stage\": \"Dance Arena\",\n  \"start_time\": \"21:00\",\n  \"end_time\": \"22:30\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Update an existing artist"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE - Remove Artist",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Delete an artist from the lineup"
+      },
+      "response": []
+    }
+  ]
+}

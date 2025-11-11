@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Festival Line-Up CRUD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .form-card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .lineup-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .lineup-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background-color: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .btn-edit {
+            background-color: #4caf50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+        
+        .btn-edit:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9em;
+        }
+        
+        .btn-delete:hover {
+            background-color: #da190b;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Music Festival Line-Up</h1>
+            <p>Manage the festival schedule and artist lineup</p>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="form-card">
+            <h2 id="formTitle">Add New Artist to Line-Up</h2>
+            <div id="message" class="message"></div>
+            
+            <form id="lineupForm">
+                <div class="form-group">
+                    <div>
+                        <label for="festival_name">Festival Name *</label>
+                        <input type="text" id="festival_name" placeholder="e.g., Lusaka Music Fest 2025" required>
+                    </div>
+                    <div>
+                        <label for="artist_name">Artist Name *</label>
+                        <input type="text" id="artist_name" placeholder="e.g., Chef 187" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div>
+                        <label for="stage">Stage *</label>
+                        <select id="stage" required>
+                            <option value="">Select a stage</option>
+                            <option value="Main Stage">Main Stage</option>
+                            <option value="Dance Arena">Dance Arena</option>
+                            <option value="Sunset Stage">Sunset Stage</option>
+                            <option value="Harmony Stage">Harmony Stage</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="start_time">Start Time</label>
+                        <input type="time" id="start_time">
+                    </div>
+                </div>
+                
+                <div class="form-group full">
+                    <div>
+                        <label for="end_time">End Time</label>
+                        <input type="time" id="end_time">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Save Artist</button>
+                    <button type="reset" class="btn-secondary">Clear Form</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Line-Up List Card -->
+        <div class="lineup-card">
+            <h2>Current Line-Up</h2>
+            <div class="table-responsive">
+                <table id="lineupTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Festival Name</th>
+                            <th>Artist Name</th>
+                            <th>Stage</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let editingId = null;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLineup();
+            document.getElementById('lineupForm').addEventListener('submit', handleFormSubmit);
+        });
+        
+        // Load all lineup records
+        async function loadLineup() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup`);
+                if (!response.ok) throw new Error('Failed to load lineup');
+                
+                const data = await response.json();
+                displayLineup(data);
+            } catch (error) {
+                console.error('Error loading lineup:', error);
+                showMessage('Error loading lineup', 'error');
+            }
+        }
+        
+        // Display lineup in table
+        function displayLineup(data) {
+            const tbody = document.querySelector('#lineupTable tbody');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No artists in lineup yet. Add one to get started!</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.festival_name}</td>
+                    <td>${item.artist_name}</td>
+                    <td>${item.stage}</td>
+                    <td>${item.start_time || '-'}</td>
+                    <td>${item.end_time || '-'}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editLineup(${item.id})">Edit</button>
+                        <button class="btn-delete" onclick="deleteLineup(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Handle form submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                festival_name: document.getElementById('festival_name').value,
+                artist_name: document.getElementById('artist_name').value,
+                stage: document.getElementById('stage').value,
+                start_time: document.getElementById('start_time').value,
+                end_time: document.getElementById('end_time').value
+            };
+            
+            try {
+                const method = editingId ? 'PUT' : 'POST';
+                const url = editingId 
+                    ? `${API_BASE_URL}/lineup/${editingId}` 
+                    : `${API_BASE_URL}/lineup`;
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) throw new Error('Failed to save');
+                
+                showMessage(
+                    editingId ? 'Artist updated successfully!' : 'Artist added successfully!',
+                    'success'
+                );
+                
+                document.getElementById('lineupForm').reset();
+                document.getElementById('formTitle').textContent = 'Add New Artist to Line-Up';
+                editingId = null;
+                loadLineup();
+            } catch (error) {
+                console.error('Error saving:', error);
+                showMessage('Error saving artist', 'error');
+            }
+        }
+        
+        // Edit lineup record
+        async function editLineup(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup/${id}`);
+                if (!response.ok) throw new Error('Failed to load record');
+                
+                const data = await response.json();
+                
+                document.getElementById('festival_name').value = data.festival_name;
+                document.getElementById('artist_name').value = data.artist_name;
+                document.getElementById('stage').value = data.stage;
+                document.getElementById('start_time').value = data.start_time || '';
+                document.getElementById('end_time').value = data.end_time || '';
+                
+                editingId = id;
+                document.getElementById('formTitle').textContent = `Edit Artist #${id}`;
+                document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error loading record:', error);
+                showMessage('Error loading record', 'error');
+            }
+        }
+        
+        // Delete lineup record
+        async function deleteLineup(id) {
+            if (!confirm('Are you sure you want to delete this artist from the lineup?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete');
+                
+                showMessage('Artist removed from lineup', 'success');
+                loadLineup();
+            } catch (error) {
+                console.error('Error deleting:', error);
+                showMessage('Error deleting artist', 'error');
+            }
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

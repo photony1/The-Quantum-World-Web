@@ -1,0 +1,269 @@
+🎵 GROUP 7 - MUSIC FESTIVAL LINE-UP CRUD APP
+═══════════════════════════════════════════════════════════════
+
+PROJECT CREATED SUCCESSFULLY! ✅
+
+Location: c:\Users\Save The Girls\The Quantum World Web\lineup-crud-app\
+
+═══════════════════════════════════════════════════════════════
+📋 WHAT WAS CREATED
+═══════════════════════════════════════════════════════════════
+
+✅ DOCUMENTATION (Read these first!)
+   • INDEX.md ..................... Navigation guide
+   • GETTING_STARTED.md ........... Visual step-by-step
+   • QUICK_START.md ............... 5-minute setup
+   • README.md .................... Full documentation
+   • SUMMARY.md ................... Project overview
+
+✅ BACKEND (Node.js + Express)
+   • server.js .................... REST API server
+   • db.js ........................ MySQL connection
+   • package.json ................. Dependencies
+   • .env ......................... Database config
+   • database.sql ................. SQL setup
+
+✅ FRONTEND (HTML + JavaScript)
+   • index.html ................... Beautiful UI
+
+✅ TESTING
+   • Postman_Collection.json ...... API tests
+   • SETUP_WINDOWS.bat ............ Auto-setup script
+
+═══════════════════════════════════════════════════════════════
+🚀 QUICK START (COPY & PASTE)
+═══════════════════════════════════════════════════════════════
+
+1. Open PowerShell/Command Prompt:
+   
+   cd "c:\Users\Save The Girls\The Quantum World Web\lineup-crud-app\backend"
+
+2. Install packages:
+   
+   npm install
+
+3. Create database (in MySQL):
+   
+   Run all SQL from: backend\database.sql
+
+4. Start server:
+   
+   npm start
+
+5. Open frontend in browser:
+   
+   c:\Users\Save The Girls\The Quantum World Web\lineup-crud-app\frontend\index.html
+
+═══════════════════════════════════════════════════════════════
+✨ FEATURES INCLUDED
+═══════════════════════════════════════════════════════════════
+
+✅ Database
+   • 1 table: lineup
+   • 12 sample records (Zambian artists)
+   • Auto-increment ID
+   • Timestamps: created_at, updated_at
+
+✅ REST API
+   • GET /api/lineup (list all)
+   • GET /api/lineup/:id (get one)
+   • POST /api/lineup (create)
+   • PUT /api/lineup/:id (update)
+   • DELETE /api/lineup/:id (delete)
+
+✅ Frontend
+   • Add new artists
+   • View all artists
+   • Edit existing artists
+   • Delete artists
+   • Real-time updates
+   • Beautiful responsive design
+
+═══════════════════════════════════════════════════════════════
+📊 DATABASE SCHEMA
+═══════════════════════════════════════════════════════════════
+
+Table: lineup
+
+  id (INT) - Primary Key, Auto Increment
+  festival_name (VARCHAR 150) - NOT NULL
+  artist_name (VARCHAR 150) - NOT NULL
+  stage (VARCHAR 100) - NOT NULL
+  start_time (VARCHAR 50)
+  end_time (VARCHAR 50)
+  created_at (TIMESTAMP) - Auto set
+  updated_at (TIMESTAMP) - Auto update
+
+═══════════════════════════════════════════════════════════════
+✅ ASSIGNMENT REQUIREMENTS - ALL MET
+═══════════════════════════════════════════════════════════════
+
+[✅] Single-table CRUD database
+[✅] ID with auto-increment
+[✅] At least 5 fields (7 total)
+[✅] 10+ sample records (12 included)
+[✅] Timestamps (created_at, updated_at)
+[✅] GET endpoint (list all)
+[✅] GET endpoint (single record)
+[✅] POST endpoint (create)
+[✅] PUT endpoint (update)
+[✅] DELETE endpoint (delete)
+[✅] HTML/JavaScript frontend
+[✅] Beautiful, responsive UI
+[✅] Postman-ready with collection
+[✅] Complete documentation
+[✅] Working CRUD operations
+
+═══════════════════════════════════════════════════════════════
+🎤 SAMPLE DATA (12 Artists)
+═══════════════════════════════════════════════════════════════
+
+1. Chef 187 ................... Main Stage
+2. Dizmo ...................... Dance Arena
+3. Macky2 ..................... Sunset Stage
+4. Blood Kid .................. Main Stage
+5. Yo Maps .................... Dance Arena
+6. Jae Cash ................... Harmony Stage
+7. Slap Dee ................... Main Stage
+8. K Millian .................. Sunset Stage
+9. Munga ...................... Dance Arena
+10. T-Sean .................... Harmony Stage
+11. Jay Ritch ................. Main Stage
+12. Mainje .................... Sunset Stage
+
+═══════════════════════════════════════════════════════════════
+📚 WHICH FILE TO READ FIRST?
+═══════════════════════════════════════════════════════════════
+
+START HERE → GETTING_STARTED.md
+              (Visual step-by-step guide)
+
+Then read:
+→ QUICK_START.md (5-minute version)
+→ README.md (complete reference)
+→ INDEX.md (file navigation guide)
+
+═══════════════════════════════════════════════════════════════
+🧪 TESTING OPTIONS
+═══════════════════════════════════════════════════════════════
+
+Option 1: Frontend UI (Easiest)
+  • Open index.html in browser
+  • Use the form to add/edit/delete
+  • See changes in real-time
+
+Option 2: Postman
+  • Import Postman_Collection.json
+  • Test all 5 API endpoints
+
+Option 3: Command Line (curl)
+  • See examples in QUICK_START.md
+
+═══════════════════════════════════════════════════════════════
+🔧 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+npm install fails?
+  → npm cache clean --force
+  → npm install
+
+Cannot connect to database?
+  → Check MySQL is running
+  → Verify .env credentials
+  → Ensure database exists
+
+Port 3000 already in use?
+  → Change PORT in backend/.env
+  → Or kill existing process
+
+Frontend shows Loading?
+  → Check backend is running (npm start)
+  → Check browser console (F12)
+  → Verify localhost:3000 is accessible
+
+═══════════════════════════════════════════════════════════════
+📋 SUBMISSION CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Before submitting, verify:
+
+□ Database created with 12 records
+□ Backend runs: npm start
+□ Frontend loads without errors
+□ Can see all 12 artists in table
+□ Can add new artist (POST works)
+□ Can edit artist (PUT works)
+□ Can delete artist (DELETE works)
+□ Postman tests pass (all 5 endpoints)
+□ Timestamps visible in database
+□ All files in lineup-crud-app folder
+□ README.md ready to submit
+
+═══════════════════════════════════════════════════════════════
+📁 PROJECT STRUCTURE
+═══════════════════════════════════════════════════════════════
+
+lineup-crud-app/
+├── INDEX.md ..................... This guide
+├── GETTING_STARTED.md ........... Start here!
+├── QUICK_START.md ............... Quick setup
+├── README.md .................... Full docs
+├── SUMMARY.md ................... Overview
+├── SETUP_WINDOWS.bat ............ Auto setup
+├── Postman_Collection.json ...... API tests
+│
+├── backend/
+│   ├── package.json ............. Dependencies
+│   ├── .env ..................... Config
+│   ├── server.js ................ API server
+│   ├── db.js .................... MySQL connection
+│   └── database.sql ............. SQL setup
+│
+└── frontend/
+    └── index.html ............... Beautiful UI
+
+═══════════════════════════════════════════════════════════════
+🎯 NEXT STEPS
+═══════════════════════════════════════════════════════════════
+
+1. Open GETTING_STARTED.md
+2. Follow the setup steps
+3. Create database
+4. Install packages
+5. Start server
+6. Open frontend
+7. Test everything
+8. Take screenshots
+9. Submit project
+
+═══════════════════════════════════════════════════════════════
+📞 KEY CONFIGURATION
+═══════════════════════════════════════════════════════════════
+
+Backend port: 3000
+Database: campus_crud
+Table: lineup
+Sample records: 12 artists
+
+.env Configuration:
+  PORT=3000
+  DB_HOST=127.0.0.1
+  DB_USER=root
+  DB_PASSWORD=
+  DB_NAME=campus_crud
+
+═══════════════════════════════════════════════════════════════
+✨ YOU'RE ALL SET!
+═══════════════════════════════════════════════════════════════
+
+Everything is configured, documented, and ready to use.
+
+Start with: GETTING_STARTED.md
+
+Status: ✅ COMPLETE
+Due Date: 13th November 2025
+Group: 7
+
+Happy Coding! 🎵 🚀
+
+═══════════════════════════════════════════════════════════════

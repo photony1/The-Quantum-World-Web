@@ -1,0 +1,889 @@
+════════════════════════════════════════════════════════════════════════════
+              GROUP 7 - MUSIC FESTIVAL LINE-UP CRUD APP
+                    ICT251 Activity 4 - COMPLETE CODE
+                        FULL BACKUP - SAVE THIS FILE
+════════════════════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANT: This file contains ALL working code. Do not delete!
+    If you accidentally delete project files, copy code from here.
+
+════════════════════════════════════════════════════════════════════════════
+📂 PROJECT STRUCTURE
+════════════════════════════════════════════════════════════════════════════
+
+lineup-crud-app/
+├── backend/
+│   ├── server.js ..................... (FILE 1)
+│   ├── db.js ......................... (FILE 2)
+│   ├── package.json .................. (FILE 3)
+│   ├── .env .......................... (FILE 4)
+│   └── database.sql .................. (FILE 5)
+├── frontend/
+│   └── index.html .................... (FILE 6)
+└── Postman_Collection.json ........... (FILE 7)
+
+════════════════════════════════════════════════════════════════════════════
+FILE 1: backend/server.js
+════════════════════════════════════════════════════════════════════════════
+
+const express = require('express');
+const cors = require('cors');
+const pool = require('./db');
+require('dotenv').config();
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+
+// GET all lineup records
+app.get('/api/lineup', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT * FROM lineup ORDER BY id DESC');
+    connection.release();
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching lineup:', error);
+    res.status(500).json({ error: 'Failed to fetch lineup' });
+  }
+});
+
+// GET single lineup record by ID
+app.get('/api/lineup/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT * FROM lineup WHERE id = ?', [id]);
+    connection.release();
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Lineup record not found' });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Error fetching lineup:', error);
+    res.status(500).json({ error: 'Failed to fetch lineup' });
+  }
+});
+
+// POST create new lineup record
+app.post('/api/lineup', async (req, res) => {
+  try {
+    const { festival_name, artist_name, stage, start_time, end_time } = req.body;
+    
+    if (!festival_name || !artist_name || !stage) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    const connection = await pool.getConnection();
+    const [result] = await connection.query(
+      'INSERT INTO lineup (festival_name, artist_name, stage, start_time, end_time, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
+      [festival_name, artist_name, stage, start_time, end_time]
+    );
+    connection.release();
+    
+    res.status(201).json({
+      id: result.insertId,
+      festival_name,
+      artist_name,
+      stage,
+      start_time,
+      end_time,
+      message: 'Lineup record created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating lineup:', error);
+    res.status(500).json({ error: 'Failed to create lineup' });
+  }
+});
+
+// PUT update lineup record
+app.put('/api/lineup/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { festival_name, artist_name, stage, start_time, end_time } = req.body;
+    
+    const connection = await pool.getConnection();
+    const [result] = await connection.query(
+      'UPDATE lineup SET festival_name = ?, artist_name = ?, stage = ?, start_time = ?, end_time = ?, updated_at = NOW() WHERE id = ?',
+      [festival_name, artist_name, stage, start_time, end_time, id]
+    );
+    connection.release();
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Lineup record not found' });
+    }
+    
+    res.json({ id, festival_name, artist_name, stage, start_time, end_time, message: 'Lineup updated successfully' });
+  } catch (error) {
+    console.error('Error updating lineup:', error);
+    res.status(500).json({ error: 'Failed to update lineup' });
+  }
+});
+
+// DELETE lineup record
+app.delete('/api/lineup/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connection = await pool.getConnection();
+    const [result] = await connection.query('DELETE FROM lineup WHERE id = ?', [id]);
+    connection.release();
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Lineup record not found' });
+    }
+    
+    res.json({ message: 'Lineup deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting lineup:', error);
+    res.status(500).json({ error: 'Failed to delete lineup' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+════════════════════════════════════════════════════════════════════════════
+FILE 2: backend/db.js
+════════════════════════════════════════════════════════════════════════════
+
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+module.exports = pool;
+
+════════════════════════════════════════════════════════════════════════════
+FILE 3: backend/package.json
+════════════════════════════════════════════════════════════════════════════
+
+{
+  "name": "lineup-crud-api",
+  "version": "1.0.0",
+  "description": "Music Festival Line-Up CRUD API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+
+════════════════════════════════════════════════════════════════════════════
+FILE 4: backend/.env
+════════════════════════════════════════════════════════════════════════════
+
+PORT=3000
+DB_HOST=127.0.0.1
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=campus_crud
+
+════════════════════════════════════════════════════════════════════════════
+FILE 5: backend/database.sql
+════════════════════════════════════════════════════════════════════════════
+
+-- Create Database
+CREATE DATABASE IF NOT EXISTS campus_crud;
+USE campus_crud;
+
+-- Create lineup table
+CREATE TABLE IF NOT EXISTS lineup (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  festival_name VARCHAR(150) NOT NULL,
+  artist_name VARCHAR(150) NOT NULL,
+  stage VARCHAR(100) NOT NULL,
+  start_time VARCHAR(50),
+  end_time VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert sample data (10+ records)
+INSERT INTO lineup (festival_name, artist_name, stage, start_time, end_time) VALUES
+('Lusaka Music Fest 2025', 'Chef 187', 'Main Stage', '18:00', '19:30'),
+('Lusaka Music Fest 2025', 'Dizmo', 'Dance Arena', '19:45', '21:15'),
+('Lusaka Music Fest 2025', 'Macky2', 'Sunset Stage', '21:30', '23:00'),
+('Lusaka Music Fest 2025', 'Blood Kid', 'Main Stage', '23:15', '00:45'),
+('Lusaka Music Fest 2025', 'Yo Maps', 'Dance Arena', '01:00', '02:30'),
+('Lusaka Music Fest 2025', 'Jae Cash', 'Harmony Stage', '14:00', '15:30'),
+('Lusaka Music Fest 2025', 'Slap Dee', 'Main Stage', '15:45', '17:15'),
+('Lusaka Music Fest 2025', 'K Millian', 'Sunset Stage', '17:30', '19:00'),
+('Lusaka Music Fest 2025', 'Munga', 'Dance Arena', '20:00', '21:30'),
+('Lusaka Music Fest 2025', 'T-Sean', 'Harmony Stage', '22:00', '23:30'),
+('Lusaka Music Fest 2025', 'Jay Ritch', 'Main Stage', '02:00', '03:30'),
+('Lusaka Music Fest 2025', 'Mainje', 'Sunset Stage', '04:00', '05:00');
+
+════════════════════════════════════════════════════════════════════════════
+FILE 6: frontend/index.html
+════════════════════════════════════════════════════════════════════════════
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Festival Line-Up CRUD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .form-card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .lineup-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .lineup-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background-color: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .btn-edit {
+            background-color: #4caf50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+        
+        .btn-edit:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9em;
+        }
+        
+        .btn-delete:hover {
+            background-color: #da190b;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Music Festival Line-Up</h1>
+            <p>Manage the festival schedule and artist lineup</p>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="form-card">
+            <h2 id="formTitle">Add New Artist to Line-Up</h2>
+            <div id="message" class="message"></div>
+            
+            <form id="lineupForm">
+                <div class="form-group">
+                    <div>
+                        <label for="festival_name">Festival Name *</label>
+                        <input type="text" id="festival_name" placeholder="e.g., Lusaka Music Fest 2025" required>
+                    </div>
+                    <div>
+                        <label for="artist_name">Artist Name *</label>
+                        <input type="text" id="artist_name" placeholder="e.g., Chef 187" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div>
+                        <label for="stage">Stage *</label>
+                        <select id="stage" required>
+                            <option value="">Select a stage</option>
+                            <option value="Main Stage">Main Stage</option>
+                            <option value="Dance Arena">Dance Arena</option>
+                            <option value="Sunset Stage">Sunset Stage</option>
+                            <option value="Harmony Stage">Harmony Stage</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="start_time">Start Time</label>
+                        <input type="time" id="start_time">
+                    </div>
+                </div>
+                
+                <div class="form-group full">
+                    <div>
+                        <label for="end_time">End Time</label>
+                        <input type="time" id="end_time">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Save Artist</button>
+                    <button type="reset" class="btn-secondary">Clear Form</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Line-Up List Card -->
+        <div class="lineup-card">
+            <h2>Current Line-Up</h2>
+            <div class="table-responsive">
+                <table id="lineupTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Festival Name</th>
+                            <th>Artist Name</th>
+                            <th>Stage</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        let editingId = null;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLineup();
+            document.getElementById('lineupForm').addEventListener('submit', handleFormSubmit);
+        });
+        
+        // Load all lineup records
+        async function loadLineup() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup`);
+                if (!response.ok) throw new Error('Failed to load lineup');
+                
+                const data = await response.json();
+                displayLineup(data);
+            } catch (error) {
+                console.error('Error loading lineup:', error);
+                showMessage('Error loading lineup', 'error');
+            }
+        }
+        
+        // Display lineup in table
+        function displayLineup(data) {
+            const tbody = document.querySelector('#lineupTable tbody');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No artists in lineup yet. Add one to get started!</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.festival_name}</td>
+                    <td>${item.artist_name}</td>
+                    <td>${item.stage}</td>
+                    <td>${item.start_time || '-'}</td>
+                    <td>${item.end_time || '-'}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editLineup(${item.id})">Edit</button>
+                        <button class="btn-delete" onclick="deleteLineup(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Handle form submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                festival_name: document.getElementById('festival_name').value,
+                artist_name: document.getElementById('artist_name').value,
+                stage: document.getElementById('stage').value,
+                start_time: document.getElementById('start_time').value,
+                end_time: document.getElementById('end_time').value
+            };
+            
+            try {
+                const method = editingId ? 'PUT' : 'POST';
+                const url = editingId 
+                    ? `${API_BASE_URL}/lineup/${editingId}` 
+                    : `${API_BASE_URL}/lineup`;
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) throw new Error('Failed to save');
+                
+                showMessage(
+                    editingId ? 'Artist updated successfully!' : 'Artist added successfully!',
+                    'success'
+                );
+                
+                document.getElementById('lineupForm').reset();
+                document.getElementById('formTitle').textContent = 'Add New Artist to Line-Up';
+                editingId = null;
+                loadLineup();
+            } catch (error) {
+                console.error('Error saving:', error);
+                showMessage('Error saving artist', 'error');
+            }
+        }
+        
+        // Edit lineup record
+        async function editLineup(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup/${id}`);
+                if (!response.ok) throw new Error('Failed to load record');
+                
+                const data = await response.json();
+                
+                document.getElementById('festival_name').value = data.festival_name;
+                document.getElementById('artist_name').value = data.artist_name;
+                document.getElementById('stage').value = data.stage;
+                document.getElementById('start_time').value = data.start_time || '';
+                document.getElementById('end_time').value = data.end_time || '';
+                
+                editingId = id;
+                document.getElementById('formTitle').textContent = `Edit Artist #${id}`;
+                document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error loading record:', error);
+                showMessage('Error loading record', 'error');
+            }
+        }
+        
+        // Delete lineup record
+        async function deleteLineup(id) {
+            if (!confirm('Are you sure you want to delete this artist from the lineup?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/lineup/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete');
+                
+                showMessage('Artist removed from lineup', 'success');
+                loadLineup();
+            } catch (error) {
+                console.error('Error deleting:', error);
+                showMessage('Error deleting artist', 'error');
+            }
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
+════════════════════════════════════════════════════════════════════════════
+FILE 7: Postman_Collection.json
+════════════════════════════════════════════════════════════════════════════
+
+{
+  "info": {
+    "name": "Music Festival Line-Up CRUD API",
+    "description": "Group 7 - ICT251 Activity 4 Postman Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET - List All Artists",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup"]
+        },
+        "description": "Retrieve all artists in the lineup"
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Get Single Artist",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Retrieve a specific artist by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Create New Artist",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Lusaka Music Fest 2025\",\n  \"artist_name\": \"New Artist\",\n  \"stage\": \"Main Stage\",\n  \"start_time\": \"20:00\",\n  \"end_time\": \"21:30\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/lineup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup"]
+        },
+        "description": "Create a new artist in the lineup"
+      },
+      "response": []
+    },
+    {
+      "name": "PUT - Update Artist",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Lusaka Music Fest 2025\",\n  \"artist_name\": \"Updated Artist Name\",\n  \"stage\": \"Dance Arena\",\n  \"start_time\": \"21:00\",\n  \"end_time\": \"22:30\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Update an existing artist"
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE - Remove Artist",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/lineup/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "lineup", "1"]
+        },
+        "description": "Delete an artist from the lineup"
+      },
+      "response": []
+    }
+  ]
+}
+
+════════════════════════════════════════════════════════════════════════════
+HOW TO RESTORE FILES FROM THIS BACKUP
+════════════════════════════════════════════════════════════════════════════
+
+If you accidentally delete files:
+
+1. Copy the code from the appropriate section above
+
+2. Create a new file with the correct name:
+   - backend/server.js
+   - backend/db.js
+   - backend/package.json
+   - backend/.env
+   - backend/database.sql
+   - frontend/index.html
+   - Postman_Collection.json
+
+3. Paste the code into each file
+
+4. Save all files
+
+5. Run: npm install (in backend folder)
+
+6. Done! Your project is restored!
+
+════════════════════════════════════════════════════════════════════════════
+SETUP & RUN INSTRUCTIONS
+════════════════════════════════════════════════════════════════════════════
+
+Step 1: Create Database
+   Open MySQL and run the SQL from database.sql file
+
+Step 2: Install Backend Dependencies
+   cd backend
+   npm install
+
+Step 3: Start Backend Server
+   npm start
+   
+   You should see: "Server running on http://localhost:3000"
+
+Step 4: Open Frontend
+   Open frontend/index.html in your web browser
+
+Step 5: Test the Application
+   - Add new artists
+   - Edit artists
+   - Delete artists
+   - See real-time updates
+
+════════════════════════════════════════════════════════════════════════════
+📌 IMPORTANT NOTES
+════════════════════════════════════════════════════════════════════════════
+
+✅ All 7 files are complete and working
+✅ No files need to be modified
+✅ Database has 12 sample records ready
+✅ API has all 5 CRUD endpoints
+✅ Frontend is fully functional
+✅ Everything is tested and ready
+
+⚠️  KEEP THIS FILE SAFE!
+   If you accidentally delete project files, restore them from here.
+
+════════════════════════════════════════════════════════════════════════════
+GROUP 7 - ICT251 Activity 4
+Due Date: 13th November 2025
+Status: ✅ COMPLETE
+
+Good Luck! 🎵 🚀
+════════════════════════════════════════════════════════════════════════════

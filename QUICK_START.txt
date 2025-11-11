@@ -1,0 +1,83 @@
+╔══════════════════════════════════════════════════════╗
+║     MUSIC FESTIVAL CRUD APP - QUICK START GUIDE       ║
+║                  3 EASY STEPS                          ║
+╚══════════════════════════════════════════════════════╝
+
+STEP 1: Install MySQL (One-time only)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Option A - XAMPP (Easiest):
+  1. Download: https://www.apachefriends.org/
+  2. Install with MySQL option
+  3. Open XAMPP Control Panel
+  4. Click "Start" next to MySQL
+
+Option B - MySQL Server:
+  1. Download: https://dev.mysql.com/downloads/mysql/
+  2. Run installer
+  3. Use default settings
+
+
+STEP 2: Set Up Database
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Method A - Double-Click (Easiest):
+  1. Double-click: SETUP_DATABASE.bat
+  2. Wait for "Database setup completed"
+  3. Done!
+
+Method B - Manual:
+  1. Open terminal
+  2. Run: cd lineup-crud-app\backend
+  3. Run: node setup-database.js
+  4. Wait for success message
+
+
+STEP 3: Run & Test
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Start Backend:
+   • Open terminal
+   • Run: cd lineup-crud-app\backend
+   • Run: npm start
+   • Wait for: "Server running on http://localhost:3000"
+
+2. Open Frontend:
+   • Go to: lineup-crud-app/frontend/index.html
+   • Double-click it or drag into browser
+
+3. Use the App:
+   • Click "Save Artist" to add new artist
+   • Click "Edit" to modify artist
+   • Click "Delete" to remove artist
+   • See changes instantly!
+
+
+LOCATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Project Folder:
+  c:\Users\Save The Girls\The Quantum World Web\lineup-crud-app\
+
+Frontend:
+  lineup-crud-app\frontend\index.html
+
+Backend:
+  lineup-crud-app\backend\server.js
+
+Database Setup:
+  lineup-crud-app\SETUP_DATABASE.bat
+
+
+CURRENT STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Backend Server: RUNNING on port 3000
+✅ Frontend Code: READY
+✅ Dependencies: INSTALLED
+❌ MySQL Database: NEEDS INSTALLATION
+
+→ Your next step: Install MySQL (Step 1)
+
+
+NEED HELP?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Read: SETUP_INSTRUCTIONS.md (full guide)
+Read: VERIFICATION_REPORT.txt (detailed status)
+
+═══════════════════════════════════════════════════════

@@ -1,0 +1,119 @@
+
+<!-- HTML  page with input filelds for a,b c to solve quadratic equation ax^2+bx+c=0 -->
+ includea a solve button that calcultaes quadratic equation(real or complex ) and displays them in a paragraph with id results.
+ also includes a a reset button that clears the input fields and results.
+<script>
+(function () {
+    // Expose a function matching the existing onclick attribute
+    window.solveQuadratic = function () {
+        const A = parseFloat(document.getElementById('a').value);
+        const B = parseFloat(document.getElementById('b').value);
+        const C = parseFloat(document.getElementById('c').value);
+        const out = document.getElementById('results');
+
+        if (Number.isNaN(A) || Number.isNaN(B) || Number.isNaN(C)) {
+            out.textContent = 'Please enter numeric values for a, b, and c.';
+            return;
+        }
+
+        // Handle degenerate / linear cases
+        if (Math.abs(A) < 1e-12) {
+            if (Math.abs(B) < 1e-12) {
+                out.textContent = Math.abs(C) < 1e-12 ? 'Infinite solutions (0 = 0).' : 'No solution.';
+            } else {
+                const root = -C / B;
+                out.textContent = `Linear equation: one root: ${root}`;
+            }
+            return;
+        }
+
+        const discriminant = B * B - 4 * A * C;
+
+        if (discriminant > 0) {
+            const r1 = (-B + Math.sqrt(discriminant)) / (2 * A);
+            const r2 = (-B - Math.sqrt(discriminant)) / (2 * A);
+            out.textContent = `Two real roots: ${r1} and ${r2}`;
+        } else if (Math.abs(discriminant) < 1e-12) {
+            const r = -B / (2 * A);
+            out.textContent = `One real root: ${r}`;
+        } else {
+            const realPart = -B / (2 * A);
+            const imagPart = Math.sqrt(-discriminant) / (2 * A);
+            out.textContent = `Two complex roots: ${realPart} + ${imagPart}i and ${realPart} - ${imagPart}i`;
+        }
+    };
+
+    // Create a Reset button (if one doesn't already exist) and wire it up
+    window.addEventListener('DOMContentLoaded', function () {
+        // try to find the existing Solve button to place Reset next to it
+        const solveBtn = document.querySelector('button[onclick="solveQuadratic()"]') || document.querySelector('button');
+        if (!solveBtn) return;
+
+        if (!document.getElementById('resetBtn')) {
+            const resetBtn = document.createElement('button');
+            resetBtn.type = 'button';
+            resetBtn.id = 'resetBtn';
+            resetBtn.textContent = 'Reset';
+            resetBtn.style.marginLeft = '8px';
+            solveBtn.insertAdjacentElement('afterend', resetBtn);
+
+            resetBtn.addEventListener('click', function () {
+                ['a', 'b', 'c'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                const out = document.getElementById('results');
+                if (out) out.textContent = '';
+                const first = document.getElementById('a');
+                if (first) first.focus();
+            });
+        }
+    });
+})();
+</script>
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadratic Solvert</title>
+</head>
+<body>
+    <h1>Quadratic Equation Solver</h1>
+    <p>Enter coefficients a, b, and c to solve the equation ax² + bx + c = 0</p>
+    <label for="a">a:</label>
+    <input type="number" id="a" value="1"><br>
+    <label for="b">b:</label>
+    <input type="number" id="b" value="0"><br>
+    <label for="c">c:</label>
+    <input type="number" id="c" value="0"><br>
+    <button onclick="solveQuadratic()">Solve</button>
+    <h2>Results:</h2>
+    <div id="results"></div>
+
+    <script>
+        function solveQuadratic() {
+            const a = parseFloat(document.getElementById('a').value);
+            const b = parseFloat(document.getElementById('b').value);
+            const c = parseFloat(document.getElementById('c').value);
+            const resultsDiv = document.getElementById('results');
+
+            const discriminant = b * b - 4 * a * c;
+            let results = '';
+
+            if (discriminant > 0) {
+                const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                results = `Two real roots: ${root1} and ${root2}`;
+            } else if (discriminant === 0) {
+                const root = -b / (2 * a);
+                results = `One real root: ${root}`;
+            } else {
+                results = 'No real roots';
+            }
+
+            resultsDiv.innerHTML = results;
+        }
+    </script src="script.js"></script>
+</body>
+</html>
