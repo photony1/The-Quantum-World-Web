@@ -316,7 +316,13 @@
     </div>
     
     <script>
-        const API_BASE_URL = 'http://localhost:3000/api';
+        // Environment-aware API URL
+        // On localhost: uses local backend
+        // On production: uses environment variable or live backend
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api'
+            : (window.API_ENDPOINT || `${window.location.protocol}//${window.location.hostname}/api`);
+        
         let editingId = null;
         
         // Initialize on page load
