@@ -5,238 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Festival Line-Up CRUD</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            /* Quantum neon palette */
+            --bg1: #0a0f1f;
+            --bg2: #0b002b;
+            --bg3: #12002e;
+            --text: #e5faff;
+            --card-bg: rgba(8, 12, 28, 0.42);
+            --card-border: rgba(0, 255, 234, 0.18);
+            --shadow: rgba(2, 8, 23, 0.65);
+            --accent: #00ffe0;      /* neon cyan */
+            --accent-2: #ff00ff;    /* neon magenta */
+            --success: #22c55e;
+            --danger: #ef4444;
+            --glow: 0 0 18px rgba(0,255,224,.35), 0 0 36px rgba(255,0,255,.22);
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            min-height: 100vh; padding: 28px; color: var(--text);
+            background: radial-gradient(1200px 500px at 10% -10%, #1d0040 0%, transparent 60%),
+                        radial-gradient(1200px 500px at 110% 110%, #001b33 0%, transparent 60%),
+                        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+            background-size: 200% 200%; animation: gradientShift 18s ease infinite;
+            position: relative; overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
         }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
+        .bg-decor::before, .bg-decor::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            animation: floatUp 1s ease forwards;
         }
-        
+        .bg-decor::before {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle at 30% 30%, var(--accent), transparent 60%);
+            top: -80px; left: -80px;
+        }
+        .bg-decor::after {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle at 70% 70%, var(--accent-2), transparent 60%);
+            bottom: -120px; right: -120px;
+        }
+
+        /* Neon grid overlay */
+        .quantum-grid {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background:
+                linear-gradient(rgba(0,255,224,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,0,255,0.06) 1px, transparent 1px);
+            background-size: 48px 48px, 48px 48px;
+            mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 100%);
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+
+        .header { text-align: center; margin-bottom: 28px; animation: floatUp .6s ease both; }
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2.8em; margin-bottom: 8px;
+            background: linear-gradient(120deg, #c6fff7 0%, #7afcff 35%, #ff7bff 70%, #9effff 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            text-shadow: var(--glow);
         }
-        
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        .header p { font-size: 1.12em; opacity: 0.92; }
+
+        .form-card, .lineup-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 50px var(--shadow), var(--glow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: floatUp .6s ease both;
+            transition: transform .25s ease, box-shadow .25s ease;
         }
-        
-        .form-card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .form-card h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        .form-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-        
-        label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
+        .form-card { animation-delay: .05s; }
+        .lineup-card { animation-delay: .1s; }
+        .form-card:hover, .lineup-card:hover { transform: translateY(-3px); box-shadow: 0 26px 60px rgba(16,24,40,.55); }
+
+        .form-card h2, .lineup-card h2 { color: #e7eaff; margin-bottom: 18px; font-size: 1.5em; letter-spacing: .3px; }
+
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label { display: block; color: #eef1ff; font-weight: 600; margin-bottom: 6px; opacity: .95; }
         input, select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 1em;
-            transition: border-color 0.3s;
+            width: 100%; padding: 12px 12px; font-size: 1em;
+            color: #0f172a; background: rgba(255,255,255,.9);
+            border: 2px solid transparent; border-radius: 10px;
+            outline: none; transition: all .25s ease;
         }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
+        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 6px rgba(142,160,255,.15); }
+
+        .button-group { display: flex; gap: 12px; margin-top: 18px; }
         button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 12px 20px; border: none; border-radius: 12px; font-size: 1em; font-weight: 700;
+            cursor: pointer; transition: all .25s ease; position: relative; overflow: hidden;
         }
-        
+        /* button shine */
+        button::after {
+            content: ""; position: absolute; top: -120%; left: -30%; width: 50%; height: 300%;
+            transform: rotate(25deg); background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.45), rgba(255,255,255,.0));
+            opacity: .0;
+        }
+        button:hover::after { opacity: .65; left: 120%; transition: left .7s ease; }
         .btn-primary {
-            background-color: #667eea;
-            color: white;
-            flex: 1;
+            flex: 1; color: #001015; background: linear-gradient(135deg, var(--accent), #6cfff3);
+            box-shadow: 0 10px 25px rgba(0,255,224,.35), 0 0 18px rgba(0,255,224,.25);
+            border: 1px solid rgba(0,255,224,.35);
         }
-        
-        .btn-primary:hover {
-            background-color: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(142,160,255,.5); }
+        .btn-secondary { flex: 1; color: #0f172a; background: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.35); }
+        .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(16,24,40,.25); }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 14px; border-radius: 12px; overflow: hidden; }
+        thead th {
+            position: sticky; top: 0; z-index: 2; background: linear-gradient(135deg, #6b78ff, #7d4bd6);
+            color: white; padding: 14px; text-align: left; font-weight: 700; letter-spacing: .3px; border-bottom: 1px solid rgba(255,255,255,.2);
         }
-        
-        .btn-secondary {
-            background-color: #f0f0f0;
-            color: #333;
-            flex: 1;
+        tbody td { padding: 12px 14px; background: rgba(255,255,255,.9); color: #0f172a; border-bottom: 1px solid rgba(15,23,42,.08); }
+        tbody tr { transition: background .2s ease, transform .1s ease; }
+        tbody tr:hover { background: rgba(142,160,255,.12); }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 12px; border-radius: 8px; font-size: .9em; border: none; cursor: pointer; transition: all .2s ease;
         }
-        
-        .btn-secondary:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .lineup-card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .lineup-card h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        th {
-            background-color: #667eea;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .btn-edit {
-            background-color: #4caf50;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            border: none;
-            font-size: 0.9em;
-            margin-right: 5px;
-        }
-        
-        .btn-edit:hover {
-            background-color: #45a049;
-        }
-        
-        .btn-delete {
-            background-color: #f44336;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            border: none;
-            font-size: 0.9em;
-        }
-        
-        .btn-delete:hover {
-            background-color: #da190b;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            display: block;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            display: block;
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-            font-size: 1.1em;
-        }
-        
+        .btn-edit { background: linear-gradient(135deg, #34d399, #22c55e); color: white; box-shadow: 0 0 14px rgba(34,197,94,.35); }
+        .btn-edit:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .btn-delete { background: linear-gradient(135deg, #f87171, #ef4444); color: white; box-shadow: 0 0 14px rgba(239,68,68,.35); }
+        .btn-delete:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+        .message { padding: 14px 16px; border-radius: 12px; margin-bottom: 16px; display: none; color: #0f172a; }
+        .message.success { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.35); display: block; }
+        .message.error { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.35); display: block; }
+        .empty-state { text-align: center; color: #64748b; padding: 36px; font-size: 1.05em; }
+
         @media (max-width: 768px) {
-            .form-group {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            table {
-                font-size: 0.9em;
-            }
+            .form-group { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2rem; }
+            table { font-size: .92em; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-decor"></div>
     <div class="container">
         <div class="header">
             <h1>🎵 Music Festival Line-Up</h1>
@@ -314,12 +250,16 @@
             </div>
         </div>
     </div>
+    <footer style="position: relative; z-index: 1; text-align:center; color: rgba(255,255,255,.85); margin-top: 14px; font-size: .95em;">
+        <span>✨ Lusaka Music Fest Line-Up • Crafted with style</span>
+    </footer>
     
     <script>
         // Environment-aware API URL
         // On localhost: uses local backend
         // On production: uses environment variable or live backend
-        const API_BASE_URL = window.location.hostname === 'localhost' 
+        const isLocal = window.location.protocol === 'file:' || window.location.hostname === '' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE_URL = isLocal
             ? 'http://localhost:3000/api'
             : (window.API_ENDPOINT || `${window.location.protocol}//${window.location.hostname}/api`);
         

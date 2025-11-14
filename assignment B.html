@@ -71,12 +71,12 @@
     });
 })();
 </script>
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quadratic Solvert</title>
+    <title>Quadratic Solver</title>
 </head>
 <body>
     <h1>Quadratic Equation Solver</h1>
@@ -88,32 +88,10 @@
     <label for="c">c:</label>
     <input type="number" id="c" value="0"><br>
     <button onclick="solveQuadratic()">Solve</button>
+    <button type="button" id="resetBtn">Reset</button>
+
     <h2>Results:</h2>
     <div id="results"></div>
 
-    <script>
-        function solveQuadratic() {
-            const a = parseFloat(document.getElementById('a').value);
-            const b = parseFloat(document.getElementById('b').value);
-            const c = parseFloat(document.getElementById('c').value);
-            const resultsDiv = document.getElementById('results');
-
-            const discriminant = b * b - 4 * a * c;
-            let results = '';
-
-            if (discriminant > 0) {
-                const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-                const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-                results = `Two real roots: ${root1} and ${root2}`;
-            } else if (discriminant === 0) {
-                const root = -b / (2 * a);
-                results = `One real root: ${root}`;
-            } else {
-                results = 'No real roots';
-            }
-
-            resultsDiv.innerHTML = results;
-        }
-    </script src="script.js"></script>
 </body>
 </html>
