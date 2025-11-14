@@ -24,11 +24,10 @@ function solveQuadratic() {
         resultsDiv.innerHTML = `Complex roots: ${realPart} + ${imaginaryPart}i and ${realPart} - ${imaginaryPart}i`;
     }
 }
-<script
 //function to calculate  a letter grade from a numeric score(0-100)
- //validate that score is between 0 and 100
- //handle edge cases correctly (e.g., 90 is an A, 89.9 is a B)
- //display letter grade in an HTML element with id="gradeResult"
+//validate that score is between 0 and 100
+//handle edge cases correctly (e.g., 90 is an A, 89.9 is a B)
+//display letter grade in an HTML element with id="gradeResult"
 function calculateGrade() {
     const score = parseFloat(document.getElementById('score').value);
     const gradeResultDiv = document.getElementById('gradeResult');
@@ -52,4 +51,4 @@ function calculateGrade() {
     }
 
     gradeResultDiv.innerHTML = `Your grade is: ${grade}`;
-}   
+}
